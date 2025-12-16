@@ -17,7 +17,7 @@ import java.time.Instant;
 public class JournalEntry {
 
     @Id
-    private ObjectId id;
+    private String id;
     // Mongo will generate ObjectId; Spring stores it as hex string
     @NotBlank(message = "Title is required")
     private String title;

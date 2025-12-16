@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -18,7 +19,6 @@ public class JournalEntryControllerV2 {
 
     @GetMapping
     public ResponseEntity<List<JournalEntry>> journalEntryAll() {
-
         return ResponseEntity.ok(journalEntryService.getAllEntries()); // 200 OK + JSON
     }
 

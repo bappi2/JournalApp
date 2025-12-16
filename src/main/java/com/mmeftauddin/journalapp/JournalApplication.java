@@ -5,7 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @EnableMongoAuditing
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.mmeftauddin.journalapp",
+        "com.mmeftauddin.common"
+})
 public class JournalApplication {
 
     public static void main(String[] args) {
