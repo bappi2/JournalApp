@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/journal")
+@RequestMapping("/v2/journal")
 public class JournalEntryControllerV2 {
     @Autowired
     private JournalEntryService journalEntryService;
@@ -35,8 +35,8 @@ public class JournalEntryControllerV2 {
 
     @PutMapping("/{id}")
     public ResponseEntity<JournalEntry> update(@PathVariable ObjectId id, @RequestBody JournalEntry newEntry) {
-        journalEntryService.updateJournalEntry(id, newEntry);
-        return ResponseEntity.ok(newEntry); // 200 OK
+
+        return ResponseEntity.ok(journalEntryService.updateJournalEntry(id, newEntry)); // 200 OK
     }
 
     @DeleteMapping("/{id}")
