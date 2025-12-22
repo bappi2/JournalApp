@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface JournalEntryService {
-    public void addJournalEntry(JournalEntry entry);
+    public void addJournalEntry(String username, JournalEntry entry);
     public List<JournalEntry> getAllEntries();
-    public Optional<JournalEntry> getEntryById(ObjectId id);
-    public JournalEntry updateJournalEntry(ObjectId id, JournalEntry newEntry);
-    public void deleteJournalEntry(ObjectId id);
+    public Optional<JournalEntry> getEntryById(String id);
+    public JournalEntry updateJournalEntry(String id, JournalEntry newEntry);
+    public void deleteJournalEntry(String username, String id);
+    public List<JournalEntry> getAllEntriesForUser(String username);
 }

@@ -4,21 +4,43 @@ services:
     container_name: mongodb
     ports:
       - "27017:27017"
+    # Run as root to avoid keyfile permission/ownership pain on macOS mounts
+    user: "0:0"
+    command: ["mongod", "--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile", "--bind_ip_all"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
       MONGO_INITDB_DATABASE: journaldb
     volumes:
       - mongo_data:/data/db
+      - ./mongo-keyfile:/etc/mongo-keyfile:ro
     healthcheck:
       test: ["CMD", "mongosh", "mongodb://root:example@localhost:27017/admin", "--eval", "db.runCommand({ ping: 1 })"]
       interval: 10s
       timeout: 5s
-      retries: 5
-    # uncomment if Docker on Apple Silicon complains:
-    # platform: linux/arm64
+      retries: 10
 
-  # (Optional) simple web UI
+  mongo-init:
+    image: mongo:7.0
+    depends_on:
+      - mongodb
+    restart: "no"
+    entrypoint: >
+      bash -lc '
+      until mongosh "mongodb://root:example@mongodb:27017/admin" --eval "db.runCommand({ ping: 1 })" >/dev/null 2>&1; do
+        echo "waiting for mongo...";
+        sleep 2;
+      done;
+
+      mongosh "mongodb://root:example@mongodb:27017/admin" --eval "
+        try { rs.status(); print(\"replica set already initialized\"); }
+        catch (e) {
+          rs.initiate({_id:\"rs0\", members:[{_id:0, host:\"mongodb:27017\"}]});
+          print(\"replica set initiated\");
+        }
+      "
+      '
+
   mongo-express:
     image: mongo-express:1.0.2-20
     depends_on:
@@ -28,7 +50,7 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongodb:27017/?authSource=admin
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongodb:27017/?authSource=admin&replicaSet=rs0
 
 volumes:
   mongo_data:

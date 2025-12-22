@@ -25,7 +25,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Optional<User> getUserById(ObjectId id) {
+    public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
     }
 
@@ -35,13 +35,9 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public User updateUser(ObjectId id, User user) {
+    public User updateUser(String id, User user) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
-
-        if (user.getUserName() != null) {
-            existing.setUserName(user.getUserName());
-        }
         if (user.getPassword() != null) {
             existing.setPassword(user.getPassword());
         }
@@ -50,12 +46,12 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public void deleteUser(ObjectId id) {
+    public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    public Optional<User> findByUserName(String userName) {
-        return userRepository.findByUserName(userName);
+    public Optional<User> findByUsername(String userName) {
+        return userRepository.findByUsername(userName);
     }
 }

@@ -28,24 +28,22 @@ public class UserController {
         return ResponseEntity.ok().body(userService.createUser(user));
     }
 
-    @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        Optional<User> existingUser = userService.findByUserName(user.getUserName());
-        if (existingUser.isPresent()) {
-            return ResponseEntity.ok().body(userService.updateUser(existingUser.get().getId(), user));
-        }
-        return ResponseEntity.notFound().build();
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User user) {
+        return ResponseEntity.ok().body(userService.updateUser(id, user));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable String id) {
-        return userService.getUserById(new ObjectId(id))
+        return userService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@RequestBody ObjectId id) {
-        return null;
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build(); // 204 No Content
+
     }
 }
