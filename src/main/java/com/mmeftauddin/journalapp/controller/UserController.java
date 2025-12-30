@@ -46,4 +46,10 @@ public class UserController {
         return ResponseEntity.noContent().build(); // 204 No Content
 
     }
+    @GetMapping("/{username}")
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+        return userService.findByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
