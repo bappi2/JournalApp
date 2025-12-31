@@ -7,6 +7,7 @@ import com.mmeftauddin.journalapp.service.UserService;
 import jakarta.validation.Valid;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class JournalEntryControllerV2 {
     private final JournalEntryService journalEntryService;
     private final UserService userService;
 
-    public JournalEntryControllerV2(JournalEntryService journalEntryService, UserService userService) {
+    public JournalEntryControllerV2(JournalEntryService journalEntryService, @Qualifier("defaultUserService") UserService userService) {
         this.journalEntryService = journalEntryService;
         this.userService = userService;
     }

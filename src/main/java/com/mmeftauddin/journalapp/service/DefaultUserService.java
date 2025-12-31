@@ -1,15 +1,17 @@
 package com.mmeftauddin.journalapp.service;
 
+import com.mmeftauddin.journalapp.controller.ChangePasswordRequest;
 import com.mmeftauddin.journalapp.entity.User;
 import com.mmeftauddin.journalapp.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Service("defaultUserService")
 public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
@@ -53,5 +55,10 @@ public class DefaultUserService implements UserService {
     @Override
     public Optional<User> findByUsername(String userName) {
         return userRepository.findByUsername(userName);
+    }
+
+    @Override
+    public User changePassword(ChangePasswordRequest request, Authentication authentication) {
+        throw new UnsupportedOperationException("Not supported in DefaultUserService");
     }
 }
