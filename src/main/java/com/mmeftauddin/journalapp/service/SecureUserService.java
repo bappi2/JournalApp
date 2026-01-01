@@ -17,6 +17,7 @@ import java.util.Optional;
 public class SecureUserService implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+
     public SecureUserService(UserRepository userRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.encoder = encoder;
@@ -39,22 +40,17 @@ public class SecureUserService implements UserService {
     }
 
     @Override
-    public User updateUser(String id, User user) {
-        return null;
-    }
-
-    @Override
     public void deleteUser(String id) {
-
+        userRepository.deleteById(id);
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return Optional.empty();
+        return userRepository.findByUsername(username);
     }
+
     @Override
     public User changePassword(ChangePasswordRequest request, Authentication authentication) {
-
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken) {

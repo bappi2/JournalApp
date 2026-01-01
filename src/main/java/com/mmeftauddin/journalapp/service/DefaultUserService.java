@@ -36,7 +36,7 @@ public class DefaultUserService implements UserService {
         return userRepository.findAll();
     }
 
-    @Override
+/*    @Override
     public User updateUser(String id, User user) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
@@ -45,7 +45,7 @@ public class DefaultUserService implements UserService {
         }
 
         return userRepository.save(existing);
-    }
+    }*/
 
     @Override
     public void deleteUser(String id) {

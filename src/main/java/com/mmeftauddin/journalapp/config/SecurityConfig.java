@@ -48,13 +48,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/user", "/user/").authenticated()
                         .requestMatchers("/user/**").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
-                        .requestMatchers("/v2/journal/**").authenticated()
+                        .requestMatchers("/v2/journal/**", "/v3/journal/**").authenticated()
                         .anyRequest().denyAll()
                 )
                 .httpBasic(withDefaults())
                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))
                 // If you’re using sessions + POST, CSRF can bite you. For APIs, ignore /user too:
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/user/**"));
+                //.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/user/**"));
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

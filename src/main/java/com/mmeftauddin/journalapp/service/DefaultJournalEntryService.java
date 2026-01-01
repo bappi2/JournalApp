@@ -7,6 +7,10 @@ import com.mmeftauddin.journalapp.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,15 +41,20 @@ public class DefaultJournalEntryService implements JournalEntryService {
     @Transactional
     @Override
     public void addJournalEntry(String username, JournalEntry entry) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        // Logic to add a journal entry
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
         entry.setCreatedAt(Instant.now());
         entry.setUpdatedAt(Instant.now());
+
         JournalEntry saved = journalEntryRepository.save(entry);
-        userOpt.ifPresent(user -> {
-            user.getJournalEntries().add(saved);
-            userRepository.save(user);
-        });
+
+        user.getJournalEntries().add(saved);
+        //user.setPassword(null);
+        userRepository.save(user);
+
+        // Force failure AFTER both writes
+        //throw new RuntimeException("Force rollback test");
     }
     @Override
     public List<JournalEntry> getAllEntries() {
@@ -59,6 +68,16 @@ public class DefaultJournalEntryService implements JournalEntryService {
     }
     @Override
     public JournalEntry updateJournalEntry(String id, JournalEntry newEntry) {
+        String username = currentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AccessDeniedException("User not found: " + username));
+
+        boolean owns = user.getJournalEntries().stream()
+                .anyMatch(e -> e != null && id.equals(e.getId()));
+
+        if (!owns) {
+            throw new AccessDeniedException("You can only update your own journal entries");
+        }
         JournalEntry existingEntry = journalEntryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("JournalEntry not found: " + id));
 
@@ -84,5 +103,12 @@ public class DefaultJournalEntryService implements JournalEntryService {
         });
         // Logic to delete a journal entry
         journalEntryRepository.deleteById(id);
+    }
+    private String currentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            throw new AccessDeniedException("Not authenticated");
+        }
+        return auth.getName();
     }
 }
